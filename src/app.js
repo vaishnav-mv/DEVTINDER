@@ -2,15 +2,52 @@ const express = require('express');
 const connectDB = require("./config/database.js")
 const app = express();
 const User = require('./models/user.js');
-app.use(express.json())
+const {validateSignUpData} = require('./utils/validation');
+const bcrypt = require('bcrypt');
+app.use(express.json());
 
 app.post("/signup",async (req,res)=>{
-    const user = new User(req.body); //creating a new instance of the User model
     try{
+        //validation of data
+        validateSignUpData(req);
+
+        const {firstName,lastName,emailId,password} = req.body;
+
+        //Encrypt the password
+        const passwordHash = await bcrypt.hash(password,10);
+
+        //creating a new instance of the User model
+        const user = new User({firstName,lastName,emailId,password:passwordHash}); 
+
         await user.save(); //saves into database.also returns a promise
         res.send("user added successfully");
     }catch(err){
-        res.status(400).send("error in saving the data")
+        res.status(400).send("error in saving the data: "+err.message);
+    }
+})
+
+app.post("/login",async (req,res)=>{
+    try{
+        const {emailId,password}=req.body;
+        //add a validator here
+
+        const user = await User.findOne({emailId:emailId});
+        if(!user){
+            throw new Error("Invalid credentials");
+        }
+        const isPasswordValid = await bcrypt.compare(password,user.password);
+    
+
+        if(isPasswordValid){
+            res.send("login successful");
+        }else{
+            throw new Error("Invalid credentials");
+        }
+
+
+
+    }catch(err){
+        res.status(400).send("ERROR: "+err.message);    
     }
 })
 
@@ -53,17 +90,27 @@ app.delete("/users",async (req,res)=>{
     }
 })
 
-app.patch("/users",async(req,res)=>{
-    const userId = req.body.userId;
+app.patch("/users/:userId",async(req,res)=>{
+    const userId = req.params?.userId; //if we give req.body.userId we should provide it in the body 
     const data = req.body;
+
     try{
+        const ALLOWED_UPDATES = ["firstName","lastName","password","age","gender","photoUrl","about","skills"];
+        const isUpdateAllowed = Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k));
+        if(!isUpdateAllowed){
+            throw new Error("update not allowed");
+        }
+        if(data.skills.length>10){
+            throw new Error("Max limit for adding skills exceeded"); //this is api level validation. you can also do this at db level
+        }
+
         const user = await User.findByIdAndUpdate(userId,data,{
             returnDocument:"after",
             runValidators:true
         });
         res.send("user updated successfully");
     }catch(err){
-        res.status(404).send("update failed"+err.message);
+        res.status(404).send("update failed: "+err.message);
     }
 })
 

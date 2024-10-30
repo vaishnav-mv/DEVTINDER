@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
     firstName:{
@@ -13,11 +14,21 @@ const userSchema = new mongoose.Schema({
         required:true,
         unique:true,
         lowercase:true,
-        trim:true
+        trim:true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("invalid email address"+ value);
+            }
+        }
     },
     password:{
         type:String,
-        required:true
+        required:true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("password not strong"+ value);
+            }
+        }
 
     },
     age:{
@@ -34,7 +45,12 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl:{
         type:String,
-        default:"https://www.google.com/imgres?q=dummy%20%20photo&imgurl=https%3A%2F%2Fpinnacle.works%2Fwp-content%2Fuploads%2F2022%2F06%2Fdummy-image.jpg&imgrefurl=https%3A%2F%2Fpinnacle.works%2Fdummy-image%2F&docid=DNP0Mre_yiaEeM&tbnid=wNwYhuVmPXUBSM&vet=12ahUKEwjZgsemqrOJAxXGTmwGHVsDIQoQM3oECBUQAA..i&w=452&h=449&hcb=2&ved=2ahUKEwjZgsemqrOJAxXGTmwGHVsDIQoQM3oECBUQAA"
+        default:"https://www.google.com/imgres?q=dummy%20%20photo&imgurl=https%3A%2F%2Fpinnacle.works%2Fwp-content%2Fuploads%2F2022%2F06%2Fdummy-image.jpg&imgrefurl=https%3A%2F%2Fpinnacle.works%2Fdummy-image%2F&docid=DNP0Mre_yiaEeM&tbnid=wNwYhuVmPXUBSM&vet=12ahUKEwjZgsemqrOJAxXGTmwGHVsDIQoQM3oECBUQAA..i&w=452&h=449&hcb=2&ved=2ahUKEwjZgsemqrOJAxXGTmwGHVsDIQoQM3oECBUQAA",
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("invalid URL"+ value);
+            }
+        }
     },
     about:{
         type:String,
@@ -45,6 +61,7 @@ const userSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+userSchema.index({ emailId: 1 }, { unique: true });
 const User = mongoose.model("user",userSchema);
 
 module.exports = User;
