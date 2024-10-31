@@ -4,7 +4,11 @@ const app = express();
 const User = require('./models/user.js');
 const {validateSignUpData} = require('./utils/validation');
 const bcrypt = require('bcrypt');
+const cookieParser = require("cookie-parser");
+const jwt = require('jsonwebtoken');
+const {userAuth} = require('./middlewares/auth');
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup",async (req,res)=>{
     try{
@@ -35,10 +39,17 @@ app.post("/login",async (req,res)=>{
         if(!user){
             throw new Error("Invalid credentials");
         }
-        const isPasswordValid = await bcrypt.compare(password,user.password);
+        const isPasswordValid = await user.validatePassword(password);
     
 
         if(isPasswordValid){
+
+            //Create a JWT token
+            const token = await user.getJWT();
+
+            //Add the token to the cookie and send the response back to the user
+            res.cookie("token",token);
+
             res.send("login successful");
         }else{
             throw new Error("Invalid credentials");
@@ -50,6 +61,24 @@ app.post("/login",async (req,res)=>{
         res.status(400).send("ERROR: "+err.message);    
     }
 })
+
+app.get("/profile",userAuth,async(req,res)=>{
+    try{
+        const user = req.user;
+
+        res.send(user);
+
+    }catch(err){
+        res.status(400).send("error: "+err.message);
+    }
+})
+
+app.post("/sendConnectionRequest",userAuth,(req,res)=>{
+    const user = req.user;
+    console.log("sending connection request");
+    res.send(user.firstName +" send the connection request");
+})
+
 
 app.get("/users",async (req,res)=>{
     const userEmail = req.body.emailId;
