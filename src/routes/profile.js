@@ -1,5 +1,7 @@
 const express = require('express')
 const profileRouter = express.Router()
+// const validator = require('validator');
+// const User = require('../models/user.js');
 
 const {userAuth} = require('../middlewares/auth');
 const {validateEditProfileData} = require('../utils/validation')
@@ -40,5 +42,7 @@ profileRouter.patch("/edit",userAuth,async(req,res)=>{
 })
 
 //write the forgot password api take existing pswd, take new pswd, validate the user, check new pswd is strong, no need to compare old pswd since the user is logged in
+
+
 
 module.exports = profileRouter
