@@ -10,14 +10,16 @@ app.use(cookieParser());
 const authRouter = require('./routes/auth')
 const profileRouter = require('./routes/profile')
 const requestRouter = require('./routes/request')
+const userRouter = require('./routes/user')
 
 app.use('/',authRouter)
 app.use('/profile',profileRouter)
 app.use('/request',requestRouter)
+app.use('/user',userRouter)
 
 connectDB()
 .then(()=>{
-    console.log("database connection estsblished successfully");
+    console.log("database connection established successfully");
     app.listen(8000,()=>{
         console.log("listening to port 8000");
     });
