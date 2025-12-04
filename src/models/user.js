@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
         //         throw new Error("gender is not valid");
         //     }
         // }
-    },
+    }, 
     photoUrl:{
         type:String,
         default:"https://www.google.com/imgres?q=dummy%20%20photo&imgurl=https%3A%2F%2Fpinnacle.works%2Fwp-content%2Fuploads%2F2022%2F06%2Fdummy-image.jpg&imgrefurl=https%3A%2F%2Fpinnacle.works%2Fdummy-image%2F&docid=DNP0Mre_yiaEeM&tbnid=wNwYhuVmPXUBSM&vet=12ahUKEwjZgsemqrOJAxXGTmwGHVsDIQoQM3oECBUQAA..i&w=452&h=449&hcb=2&ved=2ahUKEwjZgsemqrOJAxXGTmwGHVsDIQoQM3oECBUQAA",

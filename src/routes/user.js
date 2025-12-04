@@ -40,7 +40,7 @@ userRouter.get('/connections',userAuth, async (req,res)=>{
           .populate("toUserId",USER_SAFE_DATA)
 
         const data = connectionRequests.map((row)=>{        //this is a corner case
-            if(row.fromUserId.toString()===loggedInUser._id.toString()){
+            if(row.fromUserId._id.toString()===loggedInUser._id.toString()){
                 return row.toUserId
             }
             return row.fromUserId
