@@ -5,6 +5,8 @@ const ConnectionRequest = require('../models/connectionRequest')
 const User = require('../models/user');
 const { connection } = require('mongoose');
 
+const sendEmail=require("../utils/sendEmail")
+
 requestRouter.post("/send/:status/:toUserId",userAuth,async (req,res)=>{
     try {
         const fromUserId = req.user._id  //fromUserId comes from loggedin user through userAuth as it adds it to the req object
@@ -42,6 +44,9 @@ requestRouter.post("/send/:status/:toUserId",userAuth,async (req,res)=>{
             status
         })
         const data = await connectionRequest.save()
+
+        const emailRes=await sendEmail.run()
+
         res.json({
             message:req.user.firstName +" is "+status +" in "+ toUser.firstName,
             data
