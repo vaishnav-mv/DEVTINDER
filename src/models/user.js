@@ -67,7 +67,6 @@ const userSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
-userSchema.index({ emailId: 1 }, { unique: true });
 
 userSchema.methods.getJWT = async function (){
     const user = this; //represent that particular user model
